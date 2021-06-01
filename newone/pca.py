@@ -27,5 +27,6 @@ class PCA:
 
     def transform(self, X):
         # project data
+        self.fit(X)
         X = X - self.mean
         return np.dot(X, self.components.T)

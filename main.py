@@ -1,6 +1,5 @@
 import streamlit as st 
 import numpy as np
-import cv2
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -30,7 +29,7 @@ st.write(f"## {dataset_name} Dataset")
 
 classifier_name = st.sidebar.selectbox(
     'Select classifier',
-    ('KNN', 'SVM', 'Random Forest')
+    ('KNN', 'SVM', 'Random Forest','linear regression','LDA','Adaboost','Logistic Regression')
 )
 
 def get_dataset(name):
@@ -57,24 +56,29 @@ def add_parameter_ui(clf_name):
     elif clf_name == 'KNN':
         K = st.sidebar.slider('K', 1, 15)
         params['K'] = K
+
+
+
     else:
         max_depth = st.sidebar.slider('max_depth', 2, 15)
         params['max_depth'] = max_depth
         n_estimators = st.sidebar.slider('n_estimators', 1, 100)
         params['n_estimators'] = n_estimators
+    print(params)
     return params
 
 params = add_parameter_ui(classifier_name)
 
 def get_classifier(clf_name, params):
     clf = None
+
     if clf_name == 'SVM':
-        clf = SVM(C=params['C'])
+        clf = SVM(params['C'])
     elif clf_name == 'KNN':
-        clf = KNN(n_neighbors=params['K'])
+        clf = KNN(params['K'])
     else:
-        clf = clf = RandomForest(n_estimators=params['n_estimators'],
-            max_depth=params['max_depth'], random_state=1234)
+        clf = RandomForest(n_trees=params['n_estimators'],
+            max_depth=params['max_depth'],n_feats=10)
     return clf
 
 clf = get_classifier(classifier_name, params)
@@ -93,7 +97,7 @@ st.write(f'Accuracy =', acc)
 #### PLOT DATASET ####
 # Project the data onto the 2 primary principal components
 pca = PCA(2)
-X_projected = pca.fit_transform(X)
+X_projected = pca.transform(X)
 
 x1 = X_projected[:, 0]
 x2 = X_projected[:, 1]
